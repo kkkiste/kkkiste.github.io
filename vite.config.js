@@ -13,9 +13,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    // Output to 'docs' folder for GitHub Pages
-    outDir: 'docs',
-  },
+  // outDir wird auf den Standard 'dist' gesetzt
 })
 
