@@ -1,24 +1,47 @@
 import React from 'react';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 
 const CategoryFilter = ({ categories, onSelectCategory, selectedCategory }) => {
   return (
-    <div className="mb-8">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Kategorien:</h3>
-      <div className="flex flex-wrap gap-3">
-        <button
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-foreground">Kategorien:</h3>
+        {selectedCategory && (
+          <Badge variant="secondary" className="text-xs">
+            {categories.find(cat => cat.id === selectedCategory)?.snippet.title}
+          </Badge>
+        )}
+      </div>
+      
+      <div className="flex flex-wrap gap-2">
+        <Button
           onClick={() => onSelectCategory(null)}
-          className={`px-4 py-2 rounded-full text-lg transition-colors duration-300 ${!selectedCategory ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-200'}`}
+          variant={!selectedCategory ? "default" : "outline"}
+          size="sm"
+          className={`rounded-full transition-all duration-300 ${
+            !selectedCategory 
+              ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md' 
+              : 'hover:border-primary hover:text-primary'
+          }`}
         >
           Alle
-        </button>
+        </Button>
+        
         {categories.map((category) => (
-          <button
+          <Button
             key={category.id}
             onClick={() => onSelectCategory(category.id)}
-            className={`px-4 py-2 rounded-full text-lg transition-colors duration-300 ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-blue-200'}`}
+            variant={selectedCategory === category.id ? "default" : "outline"}
+            size="sm"
+            className={`rounded-full transition-all duration-300 ${
+              selectedCategory === category.id 
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md' 
+                : 'hover:border-primary hover:text-primary'
+            }`}
           >
             {category.snippet.title}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

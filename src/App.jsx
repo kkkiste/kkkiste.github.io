@@ -3,6 +3,8 @@ import { searchVideos, getVideoCategories } from './lib/youtubeApi';
 import VideoCard from './components/VideoCard';
 import SearchBar from './components/SearchBar';
 import CategoryFilter from './components/CategoryFilter';
+import { Button } from './components/ui/button';
+import { Moon, Sun, Sparkles } from 'lucide-react';
 import './App.css';
 
 const staticVideos = [
@@ -54,6 +56,16 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('kinderlieder');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [usingStaticData, setUsingStaticData] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Dark mode effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const filterStaticVideos = useCallback((query, categoryId) => {
     let filtered = staticVideos;
@@ -152,40 +164,131 @@ function App() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex flex-col">
-      <header className="bg-white p-4 shadow-md flex items-center justify-between">
-        <h1 className="text-4xl font-bold text-purple-600">KKKiste</h1>
-        <div className="text-3xl">🌈</div>
-      </header>
-      <main className="flex-grow container mx-auto p-4">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Willkommen bei KKKiste!</h2>
-        <p className="text-gray-700 mb-8">Hier findest du tolle Videos für Kinder.</p>
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
-        <SearchBar onSearch={handleSearch} />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 flex flex-col transition-colors duration-300">
+      {/* Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border-b border-border shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+                  KKKiste
+                </h1>
+                <p className="text-xs text-muted-foreground">Deine Video-Welt</p>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleDarkMode}
+              className="rounded-full w-10 h-10 hover:scale-110 transition-transform"
+            >
+              {darkMode ? (
+                <Sun className="h-5 w-5 text-yellow-500" />
+              ) : (
+                <Moon className="h-5 w-5 text-purple-600" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-grow container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8 animate-fade-in">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            Willkommen bei KKKiste! 👋
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Entdecke tolle Videos für Kinder - Kinderlieder, Lernvideos und vieles mehr!
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-8">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+
+        {/* Category Filter */}
         {categories.length > 0 && (
-          <CategoryFilter 
-            categories={categories}
-            onSelectCategory={handleSelectCategory}
-            selectedCategory={selectedCategory}
-          />
+          <div className="mb-8">
+            <CategoryFilter 
+              categories={categories}
+              onSelectCategory={handleSelectCategory}
+              selectedCategory={selectedCategory}
+            />
+          </div>
         )}
 
-        {loading && <p className="text-center text-lg">Videos werden geladen...</p>}
-        {error && <p className="text-center text-red-500 text-lg">Fehler: {error}</p>}
-        {usingStaticData && <p className="text-center text-orange-500 text-lg">Hinweis: YouTube API-Kontingent überschritten. Es werden statische Videos angezeigt.</p>}
+        {/* Status Messages */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-lg text-muted-foreground">Videos werden geladen...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-8">
+            <p className="text-destructive text-center">{error}</p>
+          </div>
+        )}
+        
+        {usingStaticData && !error && (
+          <div className="bg-accent/20 border border-accent/30 rounded-lg p-4 mb-8">
+            <p className="text-accent-foreground text-center">
+              ℹ️ YouTube API-Kontingent überschritten. Es werden statische Videos angezeigt.
+            </p>
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {!loading && !error && videos.map((video) => (
-            <VideoCard key={video.id.videoId} video={video} />
+        {/* Video Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {!loading && videos.map((video, index) => (
+            <div 
+              key={video.id.videoId} 
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <VideoCard video={video} />
+            </div>
           ))}
         </div>
+
+        {/* No Results */}
         {videos.length === 0 && !loading && !error && (
-          <p className="text-center text-lg text-gray-600">Keine Videos gefunden, die Ihren Kriterien entsprechen.</p>
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-xl text-muted-foreground">
+              Keine Videos gefunden, die deinen Kriterien entsprechen.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Versuche es mit einem anderen Suchbegriff!
+            </p>
+          </div>
         )}
       </main>
-      <footer className="bg-purple-600 text-white p-4 text-center">
-        <p>&copy; 2025 KKKiste. Alle Rechte vorbehalten.</p>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-900 dark:to-pink-900 text-white py-6 mt-12">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm font-medium">
+            &copy; 2025 KKKiste. Alle Rechte vorbehalten.
+          </p>
+          <p className="text-xs mt-2 opacity-80">
+            Mit ❤️ für Kinder gemacht
+          </p>
+        </div>
       </footer>
     </div>
   );
